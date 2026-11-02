@@ -1,32 +1,45 @@
 using UnityEngine;
-using TMPro; // Library untuk TextMeshPro (Wajib untuk tantangan nilai +)
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public int totalKoin;
     private int koinTerkumpul = 0;
 
-    // Tambahan untuk bonus UI Text
+    [Header("UI References")]
     public TextMeshProUGUI teksSkor;
     public GameObject teksMenang;
 
+    [Header("Item Data")]
+    public ItemDetails coinData; 
+
     void Start()
     {
-        // TODO: hitung jumlah koin di scene saat mulai
         totalKoin = GameObject.FindGameObjectsWithTag("Coin").Length;
 
-        // Setup awal UI
-        if (teksMenang != null) teksMenang.SetActive(false);
+        if (teksMenang != null) 
+        {
+            teksMenang.SetActive(false);
+        }
+        
         UpdateSkorUI();
     }
 
-    public void AmbilKoin()
+    public void AmbilKoin(Sprite icon = null)
     {
         koinTerkumpul++;
         UpdateSkorUI();
 
-        // TODO: jika koinTerkumpul == totalKoin, panggil Menang()
-        if (koinTerkumpul == totalKoin) 
+        // Kirim data ScriptableObject ItemCoin ke InventoryManager
+
+
+        
+        if (InventoryManager.Instance != null && coinData != null)
+        {
+            InventoryManager.Instance.AddItem(coinData);
+        }
+
+        if (koinTerkumpul == totalKoin)
         {
             Menang();
         }
@@ -44,7 +57,6 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("KAMU MENANG!");
 
-        // Tampilkan teks menang di layar game (Bonus nilai +)
         if (teksMenang != null)
         {
             teksMenang.SetActive(true);
