@@ -38,7 +38,18 @@ public class EnemyHealth : MonoBehaviour
     void Die()
     {
         Debug.Log(gameObject.name + " Mati!");
-        // Kamu bisa menaruh logika drop coin/potion di sini nanti
+
+        // Beritahu GameManager bahwa musuh ini kalah
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.MusuhKalah(this);
+        }
+        else
+        {
+            GameManager gm = FindAnyObjectByType<GameManager>();
+            if (gm != null) gm.MusuhKalah(this);
+        }
+
         Destroy(gameObject);
     }
 }

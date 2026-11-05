@@ -149,6 +149,17 @@ public class PlayerHealth : MonoBehaviour
 
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
+
+        // Beritahu GameManager bahwa player telah kalah
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PlayerKalah();
+        }
+        else
+        {
+            GameManager gm = FindAnyObjectByType<GameManager>();
+            if (gm != null) gm.PlayerKalah();
+        }
     }
 
     public int GetCurrentHealth() => currentHealth;
