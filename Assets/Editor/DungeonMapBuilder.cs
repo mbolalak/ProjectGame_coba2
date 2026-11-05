@@ -6,6 +6,31 @@ public class DungeonMapBuilder : EditorWindow
 {
     private const string ROOT_NAME = "--- DUNGEON MAP ---";
 
+    [MenuItem("Tools/Dungeon Generator/Open Dungeon Window...", false, 0)]
+    public static void ShowWindow()
+    {
+        GetWindow<DungeonMapBuilder>("Dungeon Generator");
+    }
+
+    private void OnGUI()
+    {
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Dungeon Room Generator", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("Klik tombol di bawah untuk membangun ruangan dungeon secara otomatis (lantai rapi, dinding ber-collider, koin tertata, dan Orc).", MessageType.Info);
+
+        GUILayout.Space(10);
+        if (GUILayout.Button("🏰 Generate Dungeon Map", GUILayout.Height(40)))
+        {
+            GenerateMap();
+        }
+
+        GUILayout.Space(5);
+        if (GUILayout.Button("🗑️ Clear Generated Map", GUILayout.Height(30)))
+        {
+            ClearMap();
+        }
+    }
+
     [MenuItem("Tools/Dungeon Generator/Generate Dungeon Map", false, 1)]
     public static void GenerateMap()
     {
@@ -163,7 +188,7 @@ public class DungeonMapBuilder : EditorWindow
         DeactivateOldObject("Coin (4)");
 
         // Deactivate old placeholder Orcs if present
-        GameObject[] oldOrcs = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        GameObject[] oldOrcs = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include);
         foreach (var obj in oldOrcs)
         {
             if (obj.name == "Orc" && obj.transform.parent == null)
