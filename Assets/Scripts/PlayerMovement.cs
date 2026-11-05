@@ -7,12 +7,20 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 arahGerak;
     public int skor = 0;
 
-    // Referensi komponen pendukung
+    [Header("Combat Settings")]
+    [SerializeField] private Transform attackPoint; // Titik ujung pedang
+    [SerializeField] private float attackRange = 0.5f; // Jarak jangkauan tebasan
+    [SerializeField] private LayerMask enemyLayers; // Layer khusus musuh
+    [SerializeField] private int attackDamage = 1;
+
+    // Referensi Komponen
+    private Rigidbody2D rb; // <-- Variabel ini yang sebelumnya belum ada
     private Animator anim;
     private SpriteRenderer spriteRenderer;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -22,27 +30,70 @@ public class PlayerMovement : MonoBehaviour
         arahGerak = value.Get<Vector2>();
     }
 
+    void OnAttack()
+    {
+        MulaiSerang();
+    }
+
     void Update()
     {
-        // 1. Gerakkan objek
-        Vector3 arah = new Vector3(arahGerak.x, arahGerak.y, 0);
-        transform.position += arah * kecepatan * Time.deltaTime;
-
-        // 2. Kirim nilai kecepatan ke Animator
+        // Parameter Animator
         if (anim != null)
         {
             anim.SetFloat("Speed", arahGerak.sqrMagnitude);
         }
 
-        // 3. Balik arah hadap karakter (kiri / kanan)
+        // Balik hadap karakter (kiri / kanan)
         if (arahGerak.x > 0.01f)
         {
-            spriteRenderer.flipX = false; // Hadap kanan
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
         else if (arahGerak.x < -0.01f)
         {
-            spriteRenderer.flipX = true;  // Hadap kiri
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
+
+        // Cadangan input langsung (Spasi atau Klik Kiri)
+        if ((Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) ||
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
+        {
+            MulaiSerang();
+        }
+    }
+
+    void FixedUpdate()
+    {
+        // Pergerakan murni fisika: otomatis mengatasi tabrakan liar & player mundur sendiri
+        rb.linearVelocity = arahGerak.normalized * kecepatan;
+    }
+
+    void MulaiSerang()
+    {
+        if (anim != null)
+        {
+            anim.SetTrigger("Attack");
+        }
+
+        // Deteksi musuh di depan Player
+        if (attackPoint != null)
+        {
+            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+            foreach (Collider2D enemy in hitEnemies)
+            {
+                EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    enemyHealth.TakeDamage(attackDamage);
+                }
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
 
     void OnTriggerEnter2D(Collider2D other)
