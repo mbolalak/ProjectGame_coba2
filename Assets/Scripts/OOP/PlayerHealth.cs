@@ -1,49 +1,92 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI; // 1. Wajib ada baris ini!
+using UnityEngine.UI;
+using TMPro; // Diperlukan untuk komponen teks TMP
 
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Health Settings")]
-    [SerializeField] private int maxHealth = 5;
+    [SerializeField] private int maxHealth = 7;
     private int currentHealth;
+    [SerializeField] private Slider healthSlider;
+    [SerializeField] private TMP_Text hpText;
 
-    [Header("UI Reference")]
-    [SerializeField] private Slider healthSlider; // 2. Baris ini yang memunculkan kolom di Inspector!
+    [Header("Shield Settings")]
+    [SerializeField] private int maxShield = 5;
+    private int currentShield;
+    [SerializeField] private Slider shieldSlider;
+    [SerializeField] private TMP_Text shieldText;
+    [SerializeField] private float shieldRegenDelay = 4f; // Jeda sebelum shield mulai mengisi ulang
+    [SerializeField] private float shieldRegenRate = 0.5f;  // Jeda per 1 poin pemulihan shield
 
     [Header("Invulnerability (i-Frames)")]
     [SerializeField] private float iFrameDuration = 1f;
     private bool isInvulnerable = false;
 
     private SpriteRenderer spriteRenderer;
+    private Coroutine shieldRegenCoroutine;
 
     void Start()
     {
         currentHealth = maxHealth;
+        currentShield = maxShield;
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        // Setel batas dan nilai awal bar darah
+        // Inisialisasi batas slider
         if (healthSlider != null)
         {
             healthSlider.minValue = 0;
             healthSlider.maxValue = maxHealth;
-            healthSlider.value = currentHealth;
         }
+
+        if (shieldSlider != null)
+        {
+            shieldSlider.minValue = 0;
+            shieldSlider.maxValue = maxShield;
+        }
+
+        UpdateUI();
     }
 
     public void TakeDamage(int damage)
     {
         if (isInvulnerable) return;
 
-        currentHealth -= damage;
-        Debug.Log("Player terkena serangan! Sisa HP: " + currentHealth);
+        int sisaDamage = damage;
 
-        // Update nilai slider saat terkena damage
-        if (healthSlider != null)
+        // 1. Serap damage dengan Shield terlebih dahulu
+        if (currentShield > 0)
         {
-            healthSlider.value = currentHealth;
+            if (currentShield >= sisaDamage)
+            {
+                currentShield -= sisaDamage;
+                sisaDamage = 0; // Shield menahan seluruh damage, nyawa aman
+            }
+            else
+            {
+                sisaDamage -= currentShield; // Kurangi sisa damage dengan sisa shield
+                currentShield = 0;          // Shield hancur
+            }
         }
 
+        // 2. Jika sisa damage masih ada (shield sudah tembus/habis), potong Health
+        if (sisaDamage > 0)
+        {
+            currentHealth -= sisaDamage;
+        }
+
+        Debug.Log($"Damage masuk! Sisa Shield: {currentShield}/{maxShield} | Sisa HP: {currentHealth}/{maxHealth}");
+
+        UpdateUI();
+
+        // Reset hitungan jeda regen shield jika sedang diserang
+        if (shieldRegenCoroutine != null)
+        {
+            StopCoroutine(shieldRegenCoroutine);
+        }
+        shieldRegenCoroutine = StartCoroutine(RegenShieldRoutine());
+
+        // Cek kematian atau aktifkan efek kebal sementara (i-frame)
         if (currentHealth <= 0)
         {
             Die();
@@ -51,6 +94,31 @@ public class PlayerHealth : MonoBehaviour
         else
         {
             StartCoroutine(DamageRoutine());
+        }
+    }
+
+    private void UpdateUI()
+    {
+        // Perbarui slider dan teks darah
+        if (healthSlider != null) healthSlider.value = currentHealth;
+        if (hpText != null) hpText.text = currentHealth + " / " + maxHealth;
+
+        // Perbarui slider dan teks perisai
+        if (shieldSlider != null) shieldSlider.value = currentShield;
+        if (shieldText != null) shieldText.text = currentShield + " / " + maxShield;
+    }
+
+    private IEnumerator RegenShieldRoutine()
+    {
+        // Tunggu beberapa detik tanpa terkena serangan
+        yield return new WaitForSeconds(shieldRegenDelay);
+
+        // Isi ulang shield satu per satu hingga penuh
+        while (currentShield < maxShield)
+        {
+            currentShield++;
+            UpdateUI();
+            yield return new WaitForSeconds(shieldRegenRate);
         }
     }
 
@@ -85,4 +153,6 @@ public class PlayerHealth : MonoBehaviour
 
     public int GetCurrentHealth() => currentHealth;
     public int GetMaxHealth() => maxHealth;
+    public int GetCurrentShield() => currentShield;
+    public int GetMaxShield() => maxShield;
 }
