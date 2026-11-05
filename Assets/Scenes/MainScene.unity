@@ -1039,8 +1039,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDetailsPanel
   itemImage: {fileID: 370143839}
   itemNameText: {fileID: 2051589544}
-  itemQuantityText: {fileID: 1232705441}
-  itemDescriptionText: {fileID: 905394117}
+  itemQuantityText: {fileID: 905394117}
+  itemDescriptionText: {fileID: 1232705441}
 --- !u!1 &417651315
 GameObject:
   m_ObjectHideFlags: 0

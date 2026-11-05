@@ -11,6 +11,28 @@ public class ItemDetailsPanel : MonoBehaviour
     [SerializeField] private TMP_Text itemQuantityText;
     [SerializeField] private TMP_Text itemDescriptionText;
 
+    private void Awake()
+    {
+        ValidateReferences();
+    }
+
+    private void ValidateReferences()
+    {
+        // Pastikan referensi tidak tertukar jika namanya mengindikasikan sebaliknya
+        if (itemQuantityText != null && itemDescriptionText != null)
+        {
+            string qtyName = itemQuantityText.gameObject.name.ToLower();
+            string descName = itemDescriptionText.gameObject.name.ToLower();
+
+            if (qtyName.Contains("desc") || descName.Contains("qty"))
+            {
+                TMP_Text temp = itemQuantityText;
+                itemQuantityText = itemDescriptionText;
+                itemDescriptionText = temp;
+            }
+        }
+    }
+
     // Show the details of the selected item.
     // quantity is the stack size currently stored in the slot.
     public void Show(ItemDetails item, int quantity)
@@ -21,20 +43,28 @@ public class ItemDetailsPanel : MonoBehaviour
             return;
         }
 
-        itemImage.sprite = item.ItemIcon;
-        itemImage.enabled = true;
-        itemNameText.text = item.ItemName;
-        itemQuantityText.text = "Quantity: " + quantity;
-        itemDescriptionText.text = item.Description;
+        ValidateReferences();
+
+        if (itemImage != null)
+        {
+            itemImage.sprite = item.ItemIcon;
+            itemImage.enabled = true;
+        }
+        if (itemNameText != null) itemNameText.text = item.ItemName;
+        if (itemQuantityText != null) itemQuantityText.text = "Quantity: " + quantity;
+        if (itemDescriptionText != null) itemDescriptionText.text = item.Description;
     }
 
     // Empty the panel, used when the selected slot has no item.
     public void Clear()
     {
-        itemImage.sprite = null;
-        itemImage.enabled = false;
-        itemNameText.text = "";
-        itemQuantityText.text = "";
-        itemDescriptionText.text = "";
+        if (itemImage != null)
+        {
+            itemImage.sprite = null;
+            itemImage.enabled = false;
+        }
+        if (itemNameText != null) itemNameText.text = "";
+        if (itemQuantityText != null) itemQuantityText.text = "";
+        if (itemDescriptionText != null) itemDescriptionText.text = "";
     }
 }
