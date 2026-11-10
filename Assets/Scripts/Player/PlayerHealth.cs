@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro; // Diperlukan untuk komponen teks TMP
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour, IDamageable
 {
     [Header("Health Settings")]
     [SerializeField] private int maxHealth = 7;
@@ -46,6 +46,12 @@ public class PlayerHealth : MonoBehaviour
         }
 
         UpdateUI();
+    }
+
+    // Implementasi IDamageable (Abstraction)
+    public void KenaDamage(int jumlah)
+    {
+        TakeDamage(jumlah);
     }
 
     public void TakeDamage(int damage)

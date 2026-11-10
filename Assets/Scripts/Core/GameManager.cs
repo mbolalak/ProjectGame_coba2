@@ -121,7 +121,25 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"[GameManager] Sisa musuh hidup: {activeCount}");
 
+        // Jika spawner masih aktif memunculkan musuh selama 1 menit, tahan kondisi menang
+        if (EnemySpawner.Instance != null && !EnemySpawner.Instance.IsSelesai())
+        {
+            return;
+        }
+
         if (activeCount <= 0 || (totalMusuh > 0 && musuhTerkalahkan >= totalMusuh))
+        {
+            Menang();
+        }
+    }
+
+    // Dipanggil dari EnemySpawner saat timer 1 menit habis
+    public void CekKondisiMenang()
+    {
+        if (isGameOver && !isGameWon) return;
+
+        EnemyHealth[] remaining = Object.FindObjectsByType<EnemyHealth>(FindObjectsInactive.Exclude);
+        if (remaining.Length <= 0)
         {
             Menang();
         }

@@ -1,13 +1,28 @@
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour
+public class EnemyHealth : MonoBehaviour, IDamageable
 {
     [SerializeField] private int maxHealth = 3;
     private int currentHealth;
 
-    void Start()
+    private void Awake()
     {
         currentHealth = maxHealth;
+    }
+
+    void Start()
+    {
+        // Pastikan currentHealth selalu terisi jika belum di Awake
+        if (currentHealth <= 0)
+        {
+            currentHealth = maxHealth;
+        }
+    }
+
+    // Implementasi IDamageable
+    public void KenaDamage(int jumlah)
+    {
+        TakeDamage(jumlah);
     }
 
     public void TakeDamage(int damage)

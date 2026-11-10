@@ -15,3 +15,4 @@ MonoBehaviour:
   itemName: Coin
   quantity: 1
   itemIcon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  description: Koin emas berharga untuk menambah skor dan pundi kekayaan.

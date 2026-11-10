@@ -27,6 +27,29 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
 
     public InventoryManager inventoryManager;
 
+    private void Awake()
+    {
+        // Auto-heal / perbaiki referensi jika kosong atau salah sambung akibat copy-paste
+        if (selectedPanel == null || selectedPanel.transform.parent != transform)
+        {
+            Transform childPanel = transform.Find("SelectedPanel");
+            if (childPanel != null)
+            {
+                selectedPanel = childPanel.gameObject;
+            }
+        }
+
+        if (quantityText == null)
+        {
+            quantityText = GetComponentInChildren<TMP_Text>(true);
+        }
+
+        if (itemImage == null)
+        {
+            itemImage = GetComponent<Image>();
+        }
+    }
+
     public void Start()
     {
         inventoryManager = FindAnyObjectByType<InventoryManager>();
