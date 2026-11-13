@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
 
         if (teksStatus != null)
         {
-            teksStatus.text = "GAME OVER!\nKamu Telah Gugur\n(Tekan [R] untuk Coba Lagi)";
+            teksStatus.text = "GAME OVER!\nKamu Telah Gugur";
             teksStatus.color = Color.red;
             teksStatus.gameObject.SetActive(true);
         }
@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour
 
         if (teksStatus != null)
         {
-            teksStatus.text = "VICTORY!\nSeluruh Musuh Telah Dikalahkan!\n(Tekan [R] untuk Main Lagi)";
+            teksStatus.text = "VICTORY!\nSeluruh Musuh Telah Dikalahkan!";
             teksStatus.color = new Color(1f, 0.85f, 0.2f);
             teksStatus.gameObject.SetActive(true);
         }
@@ -198,16 +198,12 @@ public class GameManager : MonoBehaviour
         {
             GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
             boxStyle.fontSize = 22;
-            boxStyle.alignment = TextAnchor.MiddleCenter;
+            boxStyle.alignment = TextAnchor.UpperCenter;
             boxStyle.fontStyle = FontStyle.Bold;
+            boxStyle.padding.top = 18;
 
-            GUIStyle subStyle = new GUIStyle(GUI.skin.label);
-            subStyle.fontSize = 15;
-            subStyle.alignment = TextAnchor.MiddleCenter;
-            subStyle.normal.textColor = Color.white;
-
-            float boxWidth = 440;
-            float boxHeight = 170;
+            float boxWidth = 420;
+            float boxHeight = 135;
             float x = (Screen.width - boxWidth) / 2;
             float y = (Screen.height - boxHeight) / 2;
 
@@ -223,9 +219,7 @@ public class GameManager : MonoBehaviour
             }
 
             GUI.color = Color.white;
-            GUI.Label(new Rect(x, y + 85, boxWidth, 25), "Tekan [R] pada keyboard untuk Coba Lagi", subStyle);
-
-            if (GUI.Button(new Rect(x + 130, y + 115, 180, 35), "🔄 Main Lagi (Restart)"))
+            if (GUI.Button(new Rect(x + (boxWidth - 180) / 2, y + 82, 180, 36), "🔄 Main Lagi (Restart)"))
             {
                 RestartGame();
             }

@@ -19,10 +19,11 @@
 - **Game Management**: `Assets/Scripts/GameManager.cs`
 - **Player Controller**: `Assets/Scripts/PlayerMovement.cs`
 - **OOP Implementations**:
-  - **Abstraction**: `IDamageable.cs`
-  - **Inheritance**: Base `Enemy.cs` inherited by specialized enemies.
-  - **Polymorphism**: Virtual/override methods (e.g. `Serang()`).
-- **State Machine**: `Assets/Scripts/StateZombie.cs` (`IDLE`, `PATROL`, `CHASE`, `ATTACK`).
+  - **Abstraction**: `IDamageable.cs` (diimplementasikan oleh `EnemyHealth.cs` dan `PlayerHealth.cs`).
+  - **Inheritance**: Base class `EnemyAI.cs` diwarisi oleh subclass spesifik seperti `OrcAI.cs`.
+  - **Polymorphism**: Method virtual/override `Serang(GameObject target)` pada `EnemyAI.cs` yang di-override di `OrcAI.cs` (musuh hancur setelah menyerang sesuai ketentuan PAS).
+  - **Encapsulation**: Penggunaan `[SerializeField] protected/private` beserta property getter pada `EnemyAI.cs` dan `EnemyHealth.cs`.
+- **State Machine**: Terintegrasi pada `EnemyAI.cs` menggunakan enum `StateZombie.cs` (`IDLE`, `PATROL`, `CHASE`, `ATTACK`).
 - **Events & Delegates**:
   - `BelajarDelegate.cs`
   - `PemancarEvent.cs` (emits jump/space event)

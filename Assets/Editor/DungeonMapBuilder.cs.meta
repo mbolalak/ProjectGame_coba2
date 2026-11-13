@@ -1,2 +1,14 @@
 fileFormatVersion: 2
 guid: f8b5f05d7354b62449e982ae0503c5b4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
+  - floorSprite: {instanceID: 0}
+  - wallSprite: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

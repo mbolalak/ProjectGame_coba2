@@ -46,6 +46,51 @@ public class DungeonMapBuilder : EditorWindow
         ClearDungeon();
     }
 
+    [MenuItem("Tools/Dungeon Generator/Fix Potion in Scene", false, 3)]
+    public static void MenuFixPotion()
+    {
+        GameObject[] allObjects = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include);
+        ItemDetails potionData = AssetDatabase.LoadAssetAtPath<ItemDetails>("Assets/Scripts/Inventory/ScriptableObjects/ItemPotion.asset");
+
+        int fixedCount = 0;
+        foreach (var obj in allObjects)
+        {
+            if (obj != null && obj.name.Contains("Potion"))
+            {
+                Undo.RecordObject(obj, "Fix Potion Collectible");
+
+                CircleCollider2D col = obj.GetComponent<CircleCollider2D>();
+                if (col == null)
+                {
+                    col = Undo.AddComponent<CircleCollider2D>(obj);
+                }
+                col.isTrigger = true;
+                col.radius = 0.45f;
+
+                WorldItem wi = obj.GetComponent<WorldItem>();
+                if (wi == null)
+                {
+                    wi = Undo.AddComponent<WorldItem>(obj);
+                }
+
+                if (potionData != null)
+                {
+                    SerializedObject so = new SerializedObject(wi);
+                    so.FindProperty("itemData").objectReferenceValue = potionData;
+                    so.ApplyModifiedProperties();
+                }
+
+                EditorUtility.SetDirty(obj);
+                fixedCount++;
+            }
+        }
+
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+            UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene()
+        );
+        Debug.Log($"✅ Berhasil memperbaiki {fixedCount} Potion di scene sehingga sekarang bisa diambil!");
+    }
+
     private void OnEnable()
     {
         InitSprites();
@@ -492,7 +537,7 @@ public class DungeonMapBuilder : EditorWindow
 
         if (potionSprite != null)
         {
-            CreateDecor("Potion_Collectible", new Vector2(-16.5f, 3.5f), potionSprite, decorContainer.transform, 1.2f);
+            CreatePotionCollectible("Potion_Collectible", new Vector2(-16.5f, 3.5f), potionSprite, decorContainer.transform, 1.2f);
         }
 
         // 5. Posisikan Player ke Ruang 1 (Spawn)
@@ -593,6 +638,31 @@ public class DungeonMapBuilder : EditorWindow
         SpriteRenderer sr = decor.AddComponent<SpriteRenderer>();
         sr.sprite = sprite;
         sr.sortingOrder = 3;
+    }
+
+    private static void CreatePotionCollectible(string name, Vector2 pos, Sprite sprite, Transform parent, float scale = 1.2f)
+    {
+        GameObject potion = new GameObject(name);
+        potion.transform.SetParent(parent);
+        potion.transform.position = new Vector3(pos.x, pos.y, 0f);
+        potion.transform.localScale = Vector3.one * scale;
+
+        SpriteRenderer sr = potion.AddComponent<SpriteRenderer>();
+        sr.sprite = sprite;
+        sr.sortingOrder = 3;
+
+        CircleCollider2D col = potion.AddComponent<CircleCollider2D>();
+        col.isTrigger = true;
+        col.radius = 0.45f;
+
+        WorldItem worldItem = potion.AddComponent<WorldItem>();
+        ItemDetails potionData = AssetDatabase.LoadAssetAtPath<ItemDetails>("Assets/Scripts/Inventory/ScriptableObjects/ItemPotion.asset");
+        if (potionData != null)
+        {
+            SerializedObject soItem = new SerializedObject(worldItem);
+            soItem.FindProperty("itemData").objectReferenceValue = potionData;
+            soItem.ApplyModifiedPropertiesWithoutUndo();
+        }
     }
 
     private static void DeactivateOldObject(string name)

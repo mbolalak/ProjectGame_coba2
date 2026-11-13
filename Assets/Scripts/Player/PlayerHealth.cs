@@ -168,6 +168,23 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         }
     }
 
+    /// <summary>
+    /// Memulihkan nyawa Player hingga penuh (digunakan oleh Potion saat klik kanan di inventory)
+    /// </summary>
+    /// <returns>True jika berhasil disembuhkan, False jika sudah penuh atau sudah mati</returns>
+    public bool HealFull()
+    {
+        if (currentHealth <= 0 || currentHealth >= maxHealth)
+        {
+            return false;
+        }
+
+        currentHealth = maxHealth;
+        UpdateUI();
+        Debug.Log($"💚 [PlayerHealth] Potion digunakan! Nyawa dipulihkan penuh ({currentHealth}/{maxHealth}).");
+        return true;
+    }
+
     public int GetCurrentHealth() => currentHealth;
     public int GetMaxHealth() => maxHealth;
     public int GetCurrentShield() => currentShield;

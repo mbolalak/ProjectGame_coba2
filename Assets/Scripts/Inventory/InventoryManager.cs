@@ -182,6 +182,24 @@ private void Awake()
             slot.selectedPanel.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// Memperbarui atau membersihkan teks di ItemDetailsPanel setelah item digunakan atau jumlahnya berkurang
+    /// </summary>
+    public void RefreshDetailsPanel(ItemSlot slot)
+    {
+        if (detailsPanel != null)
+        {
+            if (slot != null && !slot.IsEmpty)
+            {
+                detailsPanel.Show(slot.ItemDetails, slot.itemQuantity);
+            }
+            else
+            {
+                detailsPanel.Clear();
+            }
+        }
+    }
 }
 
 

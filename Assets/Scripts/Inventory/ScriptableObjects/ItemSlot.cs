@@ -26,6 +26,7 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     public bool isItemSelected;
 
     public InventoryManager inventoryManager;
+    private Sprite defaultSlotSprite;
 
     private void Awake()
     {
@@ -47,6 +48,11 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         if (itemImage == null)
         {
             itemImage = GetComponent<Image>();
+        }
+
+        if (itemImage != null)
+        {
+            defaultSlotSprite = itemImage.sprite;
         }
     }
 
@@ -87,6 +93,43 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    public void RemoveQuantity(int amount)
+    {
+        itemQuantity -= amount;
+        if (itemQuantity <= 0)
+        {
+            ClearSlot();
+        }
+        else
+        {
+            isFull = false;
+            if (quantityText != null)
+            {
+                quantityText.text = itemQuantity.ToString();
+            }
+        }
+    }
+
+    public void ClearSlot()
+    {
+        itemDetails = null;
+        itemName = string.Empty;
+        itemIcon = null;
+        itemQuantity = 0;
+        isFull = false;
+
+        if (quantityText != null)
+        {
+            quantityText.text = string.Empty;
+            quantityText.enabled = false;
+        }
+
+        if (itemImage != null)
+        {
+            itemImage.sprite = defaultSlotSprite;
+        }
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left)
@@ -101,17 +144,44 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     }
 
     private void LeftClick()
-{
-    Debug.Log("Left Clicked on " + (IsEmpty ? "Empty Slot" : itemName));
-
-    if (inventoryManager != null)
     {
-        inventoryManager.SelectSlot(this);
+        Debug.Log("Left Clicked on " + (IsEmpty ? "Empty Slot" : itemName));
+
+        if (inventoryManager != null)
+        {
+            inventoryManager.SelectSlot(this);
+        }
     }
-}
 
     private void RightClick()
     {
+        if (IsEmpty || itemDetails == null) return;
+
         Debug.Log("Right Clicked on " + itemName);
+
+        // Jika item adalah Potion, pulihkan nyawa Player hingga penuh
+        if (itemName.ToLower().Contains("potion"))
+        {
+            PlayerHealth playerHealth = FindAnyObjectByType<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                if (playerHealth.GetCurrentHealth() >= playerHealth.GetMaxHealth())
+                {
+                    Debug.Log("💚 [Inventory] Nyawa Player sudah penuh!");
+                    return;
+                }
+
+                bool healed = playerHealth.HealFull();
+                if (healed)
+                {
+                    RemoveQuantity(1);
+
+                    if (inventoryManager != null)
+                    {
+                        inventoryManager.RefreshDetailsPanel(this);
+                    }
+                }
+            }
+        }
     }
 }

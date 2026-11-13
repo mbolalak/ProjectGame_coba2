@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -63,15 +64,18 @@ public class PlayerMovement : MonoBehaviour
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
 
+        // Cegah serangan jika kursor mouse sedang berada di atas UI (misal: inventaris terbuka)
+        bool isPointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
         // Cadangan input langsung (Spasi atau Klik Kiri untuk Melee)
-        if ((Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) ||
-            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
+        if (!isPointerOverUI && ((Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) ||
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)))
         {
             MulaiSerang();
         }
 
-        // Input Klik Kanan untuk Menembak Arrow
-        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+        // Input Klik Kanan untuk Menembak Arrow (Hanya jika tidak sedang mengklik UI)
+        if (!isPointerOverUI && Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
         {
             TembakArrow();
         }

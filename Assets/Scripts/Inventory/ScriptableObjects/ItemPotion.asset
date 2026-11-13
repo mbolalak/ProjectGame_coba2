@@ -15,4 +15,6 @@ MonoBehaviour:
   itemName: Health Potion
   quantity: 1
   itemIcon: {fileID: 6834701404633864263, guid: 7c696c9df71b5f040ab92a9f8ad21cc5, type: 3}
-  description: tolak angin mbah kakung
+  description: 'Heal 100% nyawa
+
+'
